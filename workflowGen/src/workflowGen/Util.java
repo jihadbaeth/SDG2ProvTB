@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Arrays;
 
-public class Distribution {
+public class Util {
 
 	public static Random random = new Random();
 
