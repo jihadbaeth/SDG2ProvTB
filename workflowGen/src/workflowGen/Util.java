@@ -4,6 +4,8 @@ import java.util.Random;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Util {
@@ -31,7 +33,41 @@ public class Util {
 
 	}
 
+	public static String[] listOfAffected(Map<String,String> successor, String tweetID)
+	{
+		String[] listOfAffected = new String[successor.size()];
+		int index =0;
+		boolean done = false;
+		String temp= successor.get(tweetID);
+		listOfAffected[index]=temp;
 
+		while(!done)
+		{
+			String key ="";
+			String val ="";
+			String temp2= successor.get(temp);
+
+			if(successor.get(temp2)!=null)
+			{
+				listOfAffected[index]=temp2;
+				index++;
+				System.out.println("Affectd: "+temp2);
+				temp=temp2;
+
+			}
+			else{
+				done=true;
+				break;
+			}
+		}
+		for (String string : listOfAffected) {
+			if (string!=null)
+			System.out.println("List of Affected "+string);
+		}
+
+		return null;
+
+	}
 
 	public static double [] probabilityTable(double [] dataSet)
 	{

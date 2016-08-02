@@ -105,6 +105,7 @@ public class WorkflowGen {
 		int agentIndex = 1;
 		int activityIndex = 1;
 		Map<String, String> successors = new HashMap<String, String>();
+		Map<String, String> tweetsList = new HashMap<String, String>();
 
 		try {
 			// start with new tweet
@@ -157,6 +158,8 @@ public class WorkflowGen {
 					successors.put(temptweetID, likeActivityID);
 					like.addArgument(likedTweet);
 					like.uses(likedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
+
+
 					// like.uses(likedTweet, File.LINK.OUTPUT,
 					// File.TRANSFER.FALSE, false);
 
@@ -174,6 +177,8 @@ public class WorkflowGen {
 
 					System.out.println("The operation  " + likeActivityID + " is a like Status upon tweet with ID "
 							+ temptweetID + " which was an effect of " + affectedBy);
+					Util.listOfAffected(tweetsList, temptweetID);
+
 
 					break;
 
@@ -207,8 +212,11 @@ public class WorkflowGen {
 					successors.put(temptweetID2, retweetActivityID);
 					successors.put(retweetID, retweetActivityID);
 
+
+					tweetsList.put(retweetID, temptweetID2);
 					System.out.println("The operation   " + retweetActivityID + " has Retweeted Status" + temptweetID2
 							+ " which was an effect of " + affectedBy2);
+					Util.listOfAffected(tweetsList, temptweetID2);
 
 					break;
 
@@ -242,8 +250,11 @@ public class WorkflowGen {
 					successors.put(temptweetID3, replyActivityID);
 					successors.put(replyID, replyActivityID);
 
+					tweetsList.put(replyID, temptweetID3);
+
 					System.out.println("The operation    " + replyActivityID + " has Replied to Status " + temptweetID3
 							+ " which was an effect of " + affectedBy3);
+					Util.listOfAffected(tweetsList, temptweetID3);
 
 					break;
 
