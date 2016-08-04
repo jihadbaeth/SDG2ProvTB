@@ -13,19 +13,27 @@ public class Util {
 	public static Random random = new Random();
 
 	public static void main(String[] args) {
-		double[] values =createNDDataset(1000);
+		double[] values =createNDDataset(1);
 		double [] probabilityTable=probabilityTable(normalize(values));
 
 		System.out.println("Start...");
-		int tossCount = 1000;
+		int tossCount = 100;
 		int credibleCount = 0;
 		int notCredibletailsCount = 0;
+		System.out.println("Starting...");
+
 		for (int i=0; i< tossCount; i++) {
-			System.out.println(probabilityTable[(int) chooseWithChance(probabilityTable)]);
-		    if (chooseWithChance(probabilityTable) > 500)
+			//System.out.println(probabilityTable[(int) chooseWithChance(probabilityTable)]);
+			System.out.println(chooseWithChance(probabilityTable));
+		    if (chooseWithChance(probabilityTable) > (probabilityTable.length)/2)
+		    {
 		    	credibleCount++;
+		    }
 		    else
+		    {
+		    	System.out.println(chooseWithChance(probabilityTable));
 		    	notCredibletailsCount++;
+		    }
 		}
 
 		System.out.println("credible"+ credibleCount);
@@ -51,7 +59,7 @@ public class Util {
 			{
 				listOfAffected[index]=temp2;
 				index++;
-				System.out.println("Affectd: "+temp2);
+//				System.out.println("Affectd: "+temp2);
 				temp=temp2;
 
 			}
@@ -73,19 +81,19 @@ public class Util {
 	{
 		double [] probabilityTable=new double[dataSet.length];
 		double sum = 0;
-		for (int i = 0; i <= 999; i++) {
+		for (int i = 0; i < dataSet.length; i++) {
 			// System.out.println(normalized[i]);
 			sum = sum + dataSet[i];
 
 		}
 		double probSum = 0;
-		for (int i = 0; i <= 999; i++) {
+		for (int i = 0; i < dataSet.length; i++) {
 			double probability = (dataSet[i]) / sum;
-			System.out.println(probability);
+//			System.out.println(probability);
 			probabilityTable[i]=probability;
 			probSum = probSum + probabilityTable[i];
 		}
-		 System.out.println("sum equals: "+ probSum);
+//		 System.out.println("sum equals: "+ probSum);
 		// normalize(values).toString();
 		 Arrays.sort(probabilityTable);
 
@@ -93,8 +101,8 @@ public class Util {
 	}
 	public static double []createNDDataset(int numberOfInstances)
 	{
-		double[] values = new double[1000];
-		for (int i = 0; i <= 999; i++) {
+		double[] values = new double[numberOfInstances];
+		for (int i = 0; i < numberOfInstances; i++) {
 			Random randomno = new Random();
 			values[i] = (randomno.nextGaussian() * 25 + 50);
 			// System.out.println(values[i]);
