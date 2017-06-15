@@ -1,10 +1,35 @@
 package workflowGen;
 
 import java.util.Random;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.lang3.ArrayUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -47,6 +72,7 @@ public class Util {
 		int index =0;
 		boolean done = false;
 		String temp= successor.get(tweetID);
+		if(listOfAffected.length>index)
 		listOfAffected[index]=temp;
 
 		while(!done)
@@ -151,5 +177,96 @@ public class Util {
 			argCount--;
 		}
 		return argCount - 1;
+	}
+
+	public static void addMissingAtt(String path) {
+
+	    XMLInputFactory inFactory = XMLInputFactory.newInstance();
+	    XMLEventReader eventReader;
+		try {
+			eventReader = inFactory.createXMLEventReader(new FileInputStream(path));
+		    XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		    XMLEventWriter writer = factory.createXMLEventWriter(new FileWriter(path+".dax"));
+		    XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+		    while (eventReader.hasNext()) {
+		        XMLEvent event = eventReader.nextEvent();
+		        writer.add(event);
+		        if (event.getEventType() == XMLEvent.START_ELEMENT) {
+//		        	System.out.println(event.asStartElement().getName().toString());
+		            if (event.asStartElement().getName().toString().equalsIgnoreCase("{http://pegasus.isi.edu/schema/DAX}job")) {
+		            	writer.add(eventFactory.createAttribute("runtime", "13.85"));
+
+		            }
+		            if (event.asStartElement().getName().toString().equalsIgnoreCase("{http://pegasus.isi.edu/schema/DAX}uses")) {
+		            	writer.add(eventFactory.createAttribute("size", "4222080"));
+
+		            }
+		        }
+		    }
+		    writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XMLStreamException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+//		try {
+//			File inputFile = new File(path);
+//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//			Document doc = dBuilder.parse(inputFile);
+//			doc.getDocumentElement().normalize();
+////			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+//			NodeList nList = doc.getElementsByTagName("job");
+////			System.out.println("----------------------------");
+//			for (int temp = 0; temp < nList.getLength(); temp++) {
+//				Node nNode = nList.item(temp);
+////				System.out.println("\nCurrent Element :" + nNode.getNodeName());
+//				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+//					Element eElement = (Element) nNode;
+//					eElement.setAttribute("runtime", "13.85");
+//					NodeList nodeList = nNode.getChildNodes();
+//					for (int j = 0; j < nodeList.getLength(); j++) {
+//						Node childNode = nodeList.item(j);
+//						if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+//
+//							//Element element = (Element) childNode;
+//
+//							if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+//								if (childNode.getNodeName().equals("metadata")) {
+////									System.out.println("Timestamp:" + " " + childNode.getTextContent());
+//								}
+//								if (childNode.getNodeName().equals("uses")) {
+////									System.out.print(element.getAttribute("name") + " ");
+////									System.out.println(element.getAttribute("link"));
+//									((Element)childNode).setAttribute("size","4222080");
+//								}
+//							}
+//						}
+//					}
+//
+//				}
+//
+//		        DOMSource source = new DOMSource(doc);
+//
+//		        StreamResult result = new StreamResult(new File(path));
+//		        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+//		        transformer.transform(source, result);
+//
+//			}
+//			System.out.println("All attributes are added...");
+//
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+
 	}
 }
