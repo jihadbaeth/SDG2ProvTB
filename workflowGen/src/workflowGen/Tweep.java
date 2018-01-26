@@ -7,6 +7,7 @@ public class Tweep {
 	public double popularity =0;
 	public double legitimacy = 0;
 	public double availability =0;
+	public Tweep[] followingList = null;
 
 	public String getUsername() {
 		return username;
@@ -48,6 +49,13 @@ public class Tweep {
 	public void setAvailability(double availability) {
 		this.availability = availability;
 	}
+	public Tweep[] getFollowingList() {
+		return followingList;
+	}
+	public void setFollowingList(Tweep[] followingList) {
+		this.followingList = followingList;
+	}
+	
 
 
 

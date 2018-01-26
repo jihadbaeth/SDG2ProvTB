@@ -87,6 +87,9 @@ public class WorkflowGen {
 		double[] availability =Util.createNDDataset(500);
 		double[] legitimacy =Util.createNDDataset(500);
 		Tweep[] users =createTweepList(500,Util.normalize(popularity),Util.normalize(availability),Util.normalize(legitimacy));
+		for(Tweep t: users){
+			
+		}
 		ArrayList <Double>tweetVisibility= new ArrayList<Double>();
 
 
