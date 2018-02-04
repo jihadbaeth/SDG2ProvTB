@@ -1,13 +1,13 @@
 package workflowGen;
 
 public class Tweep {
-	public String username ="";
-	public String name="";
-	public String bio="";
-	public double popularity =0;
-	public double legitimacy = 0;
-	public double availability =0;
-	public Tweep[] followingList = null;
+    private String username = "";
+    private String name = "";
+    private String bio = "";
+    private double popularity = 0;
+    private double legitimacy = 0;
+    private double availability = 0;
+    private Tweep[] followingList = null;
 
 	public String getUsername() {
 		return username;
@@ -55,8 +55,6 @@ public class Tweep {
 	public void setFollowingList(Tweep[] followingList) {
 		this.followingList = followingList;
 	}
-	
-
 
 
 }

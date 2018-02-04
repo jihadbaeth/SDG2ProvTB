@@ -1,19 +1,14 @@
 package workflowGen;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.fluttercode.datafactory.impl.DataFactory;
 import edu.isi.pegasus.planner.dax.ADAG;
 import edu.isi.pegasus.planner.dax.File;
 import edu.isi.pegasus.planner.dax.Job;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.fluttercode.datafactory.impl.DataFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 
@@ -27,7 +22,7 @@ public class WorkflowGen {
 		for(int i =401; i<=500; i++)
 		{
 			ingestor.createSocialWorkflow(1000, i, "1K");
-			Util.addMissingAtt("/home/jihad/Desktop/CRDAX/1K/dax_"+ i + "_1K_");
+            Util.addMissingAtt("C:\\Users\\jehad\\Desktop\\Dax\\dax_" + i + "_1K_");
 
 		}
 
@@ -53,20 +48,42 @@ public class WorkflowGen {
 		Tweep[] tweep = new Tweep[size];
         DataFactory df = new DataFactory();
 
-		for(int i=0;i<size;i++)
-		{
-			Tweep temp = new Tweep();
-			temp.setUsername(("@"+df.getFirstName() + ""+ df.getLastName()).replace("'", ""));
-			temp.setName((df.getFirstName() + " "+ df.getLastName()).replace("'", ""));
-			temp.setBio(df.getEmailAddress());
-			temp.setPopularity(popu[i]);
-			temp.setAvailability(avail[i]);
-			temp.setLegitimacy(legit[i]);
-			System.out.println("Created");
-			System.out.println(temp.toString());
-			tweep[i]= temp;
-		}
-		return tweep;
+        for (int i = 0; i < size; i++) {
+            Tweep temp = new Tweep();
+            temp.setUsername(("@" + df.getFirstName() + "" + df.getLastName()).replace("'", ""));
+            temp.setName((df.getFirstName() + " " + df.getLastName()).replace("'", ""));
+            temp.setBio(df.getEmailAddress());
+            temp.setPopularity(popu[i]);
+            temp.setAvailability(avail[i]);
+            temp.setLegitimacy(legit[i]);
+            System.out.println("Created");
+            System.out.println(temp.toString());
+            tweep[i] = temp;
+        }
+        for (int currentUser = 0; currentUser < tweep.length; currentUser++) {
+            Tweep t = tweep[currentUser];
+            int numberOfFollowers = (int) (t.getPopularity() * 100);
+            System.out.println("Number of Followers for user " + t.getUsername() + " is" + numberOfFollowers);
+            Tweep[] followingList = new Tweep[numberOfFollowers];
+            int currentFollower = 0;
+            ArrayList<Integer> keepTrack = new ArrayList<Integer>();
+            while (currentFollower < numberOfFollowers) {
+                Random rand = new Random();
+                int n = rand.nextInt(tweep.length);
+                if (currentUser != n && !keepTrack.contains(n)) {
+                    followingList[currentFollower] = tweep[n];
+                    keepTrack.add(n);
+                    currentFollower++;
+
+                }
+            }
+            for (Tweep temp : followingList) {
+                System.out.println(temp.getUsername());
+            }
+            tweep[currentUser].setFollowingList(followingList);
+
+        }
+        return tweep;
 
 	}
 
@@ -87,9 +104,8 @@ public class WorkflowGen {
 		double[] availability =Util.createNDDataset(500);
 		double[] legitimacy =Util.createNDDataset(500);
 		Tweep[] users =createTweepList(500,Util.normalize(popularity),Util.normalize(availability),Util.normalize(legitimacy));
-		for(Tweep t: users){
-			
-		}
+        //
+
 		ArrayList <Double>tweetVisibility= new ArrayList<Double>();
 
 
@@ -114,11 +130,11 @@ public class WorkflowGen {
 			mainTweet.addArgument("Username", users[userIndex].getName()+",");
 			mainTweet.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 			mainTweet.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
-			mainTweet.addArgument("lagitimacy_score", ""+users[userIndex].getLegitimacy());
-			mainTweet.addMetaData("timeStamp", ft.format(timeStamp));
-			mainTweet.uses(tweet, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
-			String mainUserCredi =users[userIndex].getPopularity()+"";
-			dax.addJob(mainTweet);
+            mainTweet.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+            mainTweet.addMetaData("timeStamp", ft.format(timeStamp));
+            mainTweet.uses(tweet, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
+            String mainUserCredi = users[userIndex].getPopularity() + "";
+            dax.addJob(mainTweet);
 			successors.put("http://twitter.com/status_" + iteration + "_" + id + "_" + entityIndex,
 					"workflow_main_" + iteration + "_" + id);
 
@@ -153,9 +169,9 @@ public class WorkflowGen {
 							+ (int)Util.chooseWithChance(Util.probabilityTable(Util.normalize(
 									ArrayUtils.toPrimitive(tweetVisibility.toArray(new Double[tweetVisibility.size()])))));
 					userIndex =generateRand(popularity.length-1,0);
-					String affectedBy = (String) successors.get(temptweetID);
-					Job like = new Job(likeActivityID, "like");
-					File likedTweet = new File(temptweetID);
+                    String affectedBy = successors.get(temptweetID);
+                    Job like = new Job(likeActivityID, "like");
+                    File likedTweet = new File(temptweetID);
 
 					// adding relationships
 					successors.put(temptweetID, likeActivityID);
@@ -165,8 +181,8 @@ public class WorkflowGen {
 					like.addArgument("Username", users[userIndex].getName()+",");
 					like.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 					like.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
-					like.addArgument("lagitimacy_score", ""+users[userIndex].getLegitimacy());
-					like.uses(likedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
+                    like.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+                    like.uses(likedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
 
 
 					// like.uses(likedTweet, File.LINK.OUTPUT,
@@ -202,9 +218,9 @@ public class WorkflowGen {
 					String temptweetID2 = "http://twitter.com/status_" + iteration + "_" + id + "_"
 							+ (int)Util.chooseWithChance(Util.probabilityTable(Util.normalize(
 									ArrayUtils.toPrimitive(tweetVisibility.toArray(new Double[tweetVisibility.size()])))));
-					String affectedBy2 = (String) successors.get(temptweetID2);
-					activityIndex = activityIndex + 1;
-					String retweetActivityID = "activity_" + iteration + "_" + id + "_" + activityIndex;
+                    String affectedBy2 = successors.get(temptweetID2);
+                    activityIndex = activityIndex + 1;
+                    String retweetActivityID = "activity_" + iteration + "_" + id + "_" + activityIndex;
 
 					// incrementEntityIndex();
 					entityIndex = entityIndex + 1;
@@ -219,11 +235,11 @@ public class WorkflowGen {
 					retweet.addArgument("Username", users[userIndex].getName()+",");
 					retweet.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 					retweet.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
-					retweet.addArgument("lagitimacy_score", ""+users[userIndex].getLegitimacy());
-					retweet.uses(retweetedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
-					retweet.uses(theRetweet, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
-					retweet.addMetaData("timeStamp", ft.format(timeStamp));
-					retweet.addArgument(retweetedTweet);
+                    retweet.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+                    retweet.uses(retweetedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
+                    retweet.uses(theRetweet, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
+                    retweet.addMetaData("timeStamp", ft.format(timeStamp));
+                    retweet.addArgument(retweetedTweet);
 					dax.addJob(retweet);
 					dax.addDependency(affectedBy2, retweetActivityID);
 
@@ -249,9 +265,9 @@ public class WorkflowGen {
 							+ (int)Util.chooseWithChance(Util.probabilityTable(Util.normalize(
 									ArrayUtils.toPrimitive(tweetVisibility.toArray(new Double[tweetVisibility.size()])))));
 					// AddEntityAttributes(temptweetID3);
-					String affectedBy3 = (String) successors.get(temptweetID3);
-					activityIndex = activityIndex + 1;
-					String replyActivityID = "activity_" + iteration + "_" + id + "_" + activityIndex;
+                    String affectedBy3 = successors.get(temptweetID3);
+                    activityIndex = activityIndex + 1;
+                    String replyActivityID = "activity_" + iteration + "_" + id + "_" + activityIndex;
 
 					// incrementEntityIndex();
 					entityIndex = entityIndex + 1;
@@ -266,11 +282,11 @@ public class WorkflowGen {
 					reply.addArgument("Username", users[userIndex].getName()+",");
 					reply.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 					reply.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
-					reply.addArgument("lagitimacy_score", ""+users[userIndex].getLegitimacy());
-					reply.addMetaData("timeStamp", ft.format(timeStamp));
-					reply.uses(repliedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
-					reply.uses(theReply, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
-					reply.addArgument(repliedTweet);
+                    reply.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+                    reply.addMetaData("timeStamp", ft.format(timeStamp));
+                    reply.uses(repliedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
+                    reply.uses(theReply, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
+                    reply.addArgument(repliedTweet);
 					dax.addJob(reply);
 					// dax.addDependency(split, wc);
 					dax.addDependency(affectedBy3, replyActivityID);
@@ -295,7 +311,7 @@ public class WorkflowGen {
 				i++;
 			}
 			dax.writeToSTDOUT();
-			dax.writeToFile("/home/jihad/Desktop/CRDAX/1K/dax_"+ iteration + "_1K_");
+            dax.writeToFile("C:\\Users\\jehad\\Desktop\\Dax\\dax_" + iteration + "_1K_");
 
 		} catch (Exception e) {
 			e.printStackTrace();
