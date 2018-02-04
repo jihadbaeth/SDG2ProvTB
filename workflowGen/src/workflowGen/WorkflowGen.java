@@ -28,7 +28,26 @@ public class WorkflowGen {
 
 
 	}
-	   public Item chooseOnWeight(List<Item> items) {
+
+    public String convertToCommaDelimetedString(Tweep[] tweep) {
+        if (tweep.length > 0) {
+            StringBuilder nameBuilder = new StringBuilder();
+
+            for (Tweep n : tweep) {
+                nameBuilder.append(n.getUsername()).append(",");
+                // can also do the following
+                // nameBuilder.append("'").append(n.replace("'", "''")).append("',");
+            }
+
+            nameBuilder.deleteCharAt(nameBuilder.length() - 1);
+
+            return nameBuilder.toString();
+        } else {
+            return "";
+        }
+    }
+
+    public Item chooseOnWeight(List<Item> items) {
 	        double completeWeight = 0.0;
 	        for (Item item : items)
 	            completeWeight += item.getWeight();
@@ -77,11 +96,12 @@ public class WorkflowGen {
 
                 }
             }
-            for (Tweep temp : followingList) {
-                System.out.println(temp.getUsername());
-            }
+
             tweep[currentUser].setFollowingList(followingList);
 
+        }
+        for (Tweep temp : tweep) {
+            System.out.println("User ID:" + temp.getUsername() + " Popularity Score: " + temp.getPopularity() + " Number of Followers: " + temp.getFollowingList().length);
         }
         return tweep;
 
@@ -131,6 +151,7 @@ public class WorkflowGen {
 			mainTweet.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 			mainTweet.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
             mainTweet.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+            mainTweet.addArgument("list_of_followers", "" + convertToCommaDelimetedString(users[userIndex].getFollowingList()));
             mainTweet.addMetaData("timeStamp", ft.format(timeStamp));
             mainTweet.uses(tweet, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
             String mainUserCredi = users[userIndex].getPopularity() + "";
@@ -182,6 +203,7 @@ public class WorkflowGen {
 					like.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 					like.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
                     like.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+                    like.addArgument("list_of_followers", "" + convertToCommaDelimetedString(users[userIndex].getFollowingList()));
                     like.uses(likedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
 
 
@@ -236,6 +258,7 @@ public class WorkflowGen {
 					retweet.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 					retweet.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
                     retweet.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+                    retweet.addArgument("list_of_followers", "" + convertToCommaDelimetedString(users[userIndex].getFollowingList()));
                     retweet.uses(retweetedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
                     retweet.uses(theRetweet, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
                     retweet.addMetaData("timeStamp", ft.format(timeStamp));
@@ -283,6 +306,7 @@ public class WorkflowGen {
 					reply.addArgument("popularity_score", ""+users[userIndex].getPopularity()+",");
 					reply.addArgument("availability_score", ""+users[userIndex].getAvailability()+",");
                     reply.addArgument("legitimacy_score", "" + users[userIndex].getLegitimacy());
+                    reply.addArgument("list_of_followers", "" + convertToCommaDelimetedString(users[userIndex].getFollowingList()));
                     reply.addMetaData("timeStamp", ft.format(timeStamp));
                     reply.uses(repliedTweet, File.LINK.INPUT, File.TRANSFER.TRUE, true);
                     reply.uses(theReply, File.LINK.OUTPUT, File.TRANSFER.TRUE, true);
@@ -310,7 +334,7 @@ public class WorkflowGen {
 
 				i++;
 			}
-			dax.writeToSTDOUT();
+            //dax.writeToSTDOUT();
             dax.writeToFile("C:\\Users\\jehad\\Desktop\\Dax\\dax_" + iteration + "_1K_");
 
 		} catch (Exception e) {
